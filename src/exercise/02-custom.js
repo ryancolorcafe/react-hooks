@@ -1,7 +1,7 @@
 // useEffect: persistent state
 // http://localhost:3000/isolated/exercise/02.js
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 
 function useLocalStorageState(key, defaultValue = '') {
   const [state, setState] = useState(
