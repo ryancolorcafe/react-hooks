@@ -1,7 +1,7 @@
 // useState: tic tac toe
 // http://localhost:3000/isolated/exercise/04.js
 
-import React from 'react'
+import React, {useState} from 'react'
 import {useLocalStorageState} from '../utils'
 
 function Board({onClick, squares}) {
@@ -39,10 +39,15 @@ function Game() {
     'squares',
     Array(9).fill(null),
   )
+  const [currentStep, setCurrentStep] = useLocalStorageState('currentStep', 0)
+  const [history, setHistory] = useState([])
 
   const nextValue = calculateNextValue(squares)
   const winner = calculateWinner(squares)
   const status = calculateStatus(winner, squares, nextValue)
+
+  console.log(history)
+  console.log(currentStep)
 
   function selectSquare(index) {
     if (squares[index] || winner) {
@@ -52,10 +57,17 @@ function Game() {
     const squaresCopy = [...squares]
     squaresCopy[index] = nextValue
     setSquares(squaresCopy)
+
+    const step = currentStep + 1
+    setCurrentStep(step)
+
+    setHistory([...history, squaresCopy])
   }
 
   function restart() {
     setSquares(Array(9).fill(null))
+    setCurrentStep(0)
+    setHistory([])
   }
 
   return (
