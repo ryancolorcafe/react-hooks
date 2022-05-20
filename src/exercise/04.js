@@ -45,9 +45,28 @@ function Game() {
   const nextValue = calculateNextValue(squares)
   const winner = calculateWinner(squares)
   const status = calculateStatus(winner, squares, nextValue)
+  const moves = history.map((move, index) => {
+    const isDisabled =
+      currentStep === index + 1 || squares[index] === history[index]
+    return (
+      <li key={index}>
+        {index === 0 ? (
+          <button disabled={isDisabled} onClick={() => goToStep(index)}>
+            Go to game start
+          </button>
+        ) : (
+          <button disabled={isDisabled} onClick={() => goToStep(index)}>
+            Go to move # {index} {isDisabled ? '(current)' : null}
+          </button>
+        )}
+      </li>
+    )
+  })
 
-  console.log(history)
-  console.log(currentStep)
+  function goToStep(index) {
+    setSquares(history[index])
+    setCurrentStep(index + 1)
+  }
 
   function selectSquare(index) {
     if (squares[index] || winner) {
@@ -80,7 +99,7 @@ function Game() {
       </div>
       <div className="game-info">
         <div>{status}</div>
-        {/* <ol>{moves}</ol> */}
+        <ol>{moves}</ol>
       </div>
     </div>
   )
