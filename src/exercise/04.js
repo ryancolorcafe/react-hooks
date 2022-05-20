@@ -1,7 +1,7 @@
 // useState: tic tac toe
 // http://localhost:3000/isolated/exercise/04.js
 
-import React, {useState} from 'react'
+import React from 'react'
 import {useLocalStorageState} from '../utils'
 
 function Board({onClick, squares}) {
@@ -35,58 +35,47 @@ function Board({onClick, squares}) {
 }
 
 function Game() {
-  const [squares, setSquares] = useLocalStorageState(
-    'squares',
+  const [history, setHistory] = useLocalStorageState('tic-tac-toe:history', [
     Array(9).fill(null),
+  ])
+  const [currentStep, setCurrentStep] = useLocalStorageState(
+    'tic-tac-toe:step',
+    0,
   )
-  const [currentStep, setCurrentStep] = useLocalStorageState('currentStep', 0)
-  const [history, setHistory] = useState([])
 
+  const squares = history[currentStep]
   const nextValue = calculateNextValue(squares)
   const winner = calculateWinner(squares)
   const status = calculateStatus(winner, squares, nextValue)
+
   const moves = history.map((move, index) => {
-    const isDisabled =
-      currentStep === index + 1 || squares[index] === history[index]
+    const isDisabled = currentStep === index
+    const buttonText = index ? `Go to move #${index}` : `Go to game start`
     return (
       <li key={index}>
-        {index === 0 ? (
-          <button disabled={isDisabled} onClick={() => goToStep(index)}>
-            Go to game start
-          </button>
-        ) : (
-          <button disabled={isDisabled} onClick={() => goToStep(index)}>
-            Go to move # {index} {isDisabled ? '(current)' : null}
-          </button>
-        )}
+        <button disabled={isDisabled} onClick={() => setCurrentStep(index)}>
+          {buttonText} {isDisabled ? '(current)' : null}
+        </button>
       </li>
     )
   })
-
-  function goToStep(index) {
-    setSquares(history[index])
-    setCurrentStep(index + 1)
-  }
 
   function selectSquare(index) {
     if (squares[index] || winner) {
       return
     }
 
+    const newHistory = history.slice(0, currentStep + 1)
     const squaresCopy = [...squares]
+
     squaresCopy[index] = nextValue
-    setSquares(squaresCopy)
-
-    const step = currentStep + 1
-    setCurrentStep(step)
-
-    setHistory([...history, squaresCopy])
+    setHistory([...newHistory, squaresCopy])
+    setCurrentStep(newHistory.length)
   }
 
   function restart() {
-    setSquares(Array(9).fill(null))
+    setHistory([Array(9).fill(null)])
     setCurrentStep(0)
-    setHistory([])
   }
 
   return (
